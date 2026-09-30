@@ -1,0 +1,6 @@
+{
+  "name": "進階探勘教育系統｜亞馬遜國家山岳協會",
+  "description": "以地形、植被、地質、水源、天氣與風險決策為主軸的進階登山探勘教案系統：12 章方法論、案例庫、判讀練習與能力分級診斷。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

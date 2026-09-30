@@ -1,0 +1,106 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_CONFIG, type BreadcrumbItem, generateOrganizationJsonLd, generateWebSiteJsonLd, generateBreadcrumbJsonLd } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string; // e.g. "" or "curriculum/" or "curriculum/ch01/"
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  jsonLd?: Record<string, any> | Array<Record<string, any>>;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonicalPath = '',
+  ogType = 'website',
+  ogImage = SITE_CONFIG.defaultOgImage,
+  breadcrumbs = [],
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+
+// Ensure canonical URL has trailing slash and base
+const normalizedPath = canonicalPath.replace(/^\/+|\/+$/g, '');
+const canonicalUrl = normalizedPath ? `${SITE_CONFIG.canonicalBase}${normalizedPath}/` : SITE_CONFIG.canonicalBase;
+
+// Generate core JSON-LD objects
+const orgJsonLd = generateOrganizationJsonLd();
+const websiteJsonLd = generateWebSiteJsonLd();
+const breadcrumbsJsonLd = breadcrumbs.length > 0 ? generateBreadcrumbJsonLd(breadcrumbs) : null;
+
+// Determine robots meta
+const robotsContent = noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large';
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>{title}</title>
+    <meta name="description" content={description.slice(0, 120)} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content={robotsContent} />
+
+    {/* Open Graph */}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description.slice(0, 120)} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:site_name" content={SITE_CONFIG.siteName} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${title} - 亞馬遜國家山岳協會`} />
+
+    {/* Twitter Card (No twitter:site as requested) */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description.slice(0, 120)} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {/* Favicon placeholder */}
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
+
+    {/* JSON-LD Schemas */}
+    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+    {breadcrumbsJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(breadcrumbsJsonLd)} />
+    )}
+    {jsonLd && (
+      Array.isArray(jsonLd) ? (
+        jsonLd.map((schema) => (
+          <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+        ))
+      ) : (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      )
+    )}
+  </head>
+  <body class="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--primary)] selection:text-[var(--primary-foreground)]">
+    {/* Accessibility Skip Link */}
+    <a href="#main-content" class="skip-to-content">
+      跳至主要內容 (Skip to main content)
+    </a>
+
+    <Header breadcrumbs={breadcrumbs} currentPath={currentPath} />
+
+    <main id="main-content" class="flex-1 w-full" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,181 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_CONFIG } from '../config/site';
+
+const practiceCollection = await getCollection('practice');
+const allPractice = practiceCollection.map(p => p.data).sort((a, b) => a.chapterNo - b.chapterNo);
+
+const methodCollection = await getCollection('methodology');
+const methodology = methodCollection[0]?.data;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '判讀練習', url: `${SITE_CONFIG.canonicalBase}practice/` },
+];
+
+const questionTypes = ['判讀題', '比較題', '風險題', '停損題', '反直覺題', '實作題'];
+---
+
+<Layout
+  title="判讀練習｜地形、路徑與停損情境題｜進階探勘教育系統｜亞馬遜國家山岳協會"
+  description="依題型分類的判讀、比較、風險、停損與反直覺練習，附判讀方向與決策矩陣工作表。"
+  canonicalPath="practice/"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 space-y-8">
+    <header class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-2">
+      <span class="font-mono text-xs text-[var(--primary)] font-semibold">PRACTICE & SCENARIOS // 50 題</span>
+      <h1 class="text-2xl font-bold">判讀練習</h1>
+      <p class="text-sm text-[var(--muted-foreground)]">
+        依題型分類的判讀、比較、風險、停損與反直覺練習。每題皆提供思考盲點與判讀方向拆解。
+      </p>
+    </header>
+
+    {/* Decision Matrix Worksheet Section with Accessible Table */}
+    {methodology && (
+      <section class="border border-[var(--border)] bg-[var(--card)] p-5 rounded-sm space-y-4">
+        <div>
+          <h2 class="text-base font-bold text-[var(--foreground)]">山域探勘決策矩陣工作表（7 項綜合成本評估）</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">遇到候選路徑分歧時，以此 7 個維度並列打分比較，避免單一線索偏誤：</p>
+        </div>
+
+        <div class="table-responsive-container">
+          <table class="w-full text-left text-xs border-collapse border border-[var(--border)]">
+            <caption class="sr-only">山域探勘路徑決策評估矩陣</caption>
+            <thead class="bg-[var(--surface)] text-[var(--foreground)] border-b border-[var(--border)]">
+              <tr>
+                <th scope="col" class="p-2.5 border border-[var(--border)] font-semibold">評估維度</th>
+                <th scope="col" class="p-2.5 border border-[var(--border)] font-semibold">觀察訊號與考量項目</th>
+                <th scope="col" class="p-2.5 border border-[var(--border)] font-semibold">高成本／高風險徵兆</th>
+                <th scope="col" class="p-2.5 border border-[var(--border)] font-semibold">撤退與停損考量</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--border)]">
+              {methodology.matrixDimensions.map((dim, idx) => (
+                <tr class="hover:bg-[var(--surface)]/50 transition-colors">
+                  <th scope="row" class="p-2.5 border border-[var(--border)] font-medium text-[var(--primary)] whitespace-nowrap">
+                    {idx + 1}. {dim}
+                  </th>
+                  <td class="p-2.5 border border-[var(--border)] text-[var(--muted-foreground)]">
+                    現場微地形、踏痕連續性、動物行為痕跡與歷史航跡交互比對。
+                  </td>
+                  <td class="p-2.5 border border-[var(--border)] text-[var(--caution)]">
+                    痕跡突斷、倒木阻斷、浮石坡度大於安息角、暴露感驟增。
+                  </td>
+                  <td class="p-2.5 border border-[var(--border)] text-[var(--muted-foreground)]">
+                    退回難度是否大於前進？是否具備原路折返腳點？
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    {/* Type Filter Buttons */}
+    <nav aria-label="題型篩選" class="border border-[var(--border)] bg-[var(--surface)] p-3 rounded-sm">
+      <p class="text-xs font-semibold text-[var(--muted-foreground)] mb-2 font-mono">依題型篩選：</p>
+      <div class="flex flex-wrap gap-1.5" id="type-filters">
+        <button
+          type="button"
+          data-type="all"
+          class="type-btn px-2.5 py-1 text-xs rounded-sm border border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)] font-medium cursor-pointer"
+        >
+          全部題型 ({allPractice.length})
+        </button>
+        {questionTypes.map(t => (
+          <button
+            type="button"
+            data-type={t}
+            class="type-btn px-2.5 py-1 text-xs rounded-sm border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--primary)] transition-colors cursor-pointer"
+          >
+            {t} ({allPractice.filter(p => p.type === t).length})
+          </button>
+        ))}
+      </div>
+    </nav>
+
+    {/* Practice Questions List */}
+    <section id="question-list" class="space-y-4">
+      <h2 class="text-lg font-bold border-b border-[var(--border)] pb-2">題庫清單</h2>
+      <div class="space-y-4">
+        {allPractice.map((ex, idx) => (
+          <article
+            class="practice-card border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5 rounded-sm space-y-3"
+            data-type={ex.type}
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs border-b border-[var(--border)] pb-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-xs font-mono font-medium text-[11px] bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30">
+                  {ex.type}
+                </span>
+                <a href={`${base}/curriculum/${ex.chapterId}/`} class="text-[var(--muted-foreground)] hover:underline">
+                  第{ex.chapterNo}章 {ex.chapterTitle}
+                </a>
+              </div>
+              <span class="font-mono text-[var(--muted-foreground)] text-[11px]">Q{String(idx + 1).padStart(2, '0')}</span>
+            </div>
+
+            <h3 class="text-sm sm:text-base font-semibold text-[var(--foreground)] leading-relaxed">
+              {ex.prompt}
+            </h3>
+
+            {/* Native <details> progressive disclosure */}
+            <details class="group border border-[var(--border)] bg-[var(--surface)] p-3 rounded-xs text-xs">
+              <summary class="cursor-pointer font-medium text-[var(--terrain)] hover:text-[var(--primary)] transition-colors flex items-center justify-between list-none">
+                <span>💡 查看判讀方向與思考引導</span>
+                <span class="text-xs transition-transform group-open:rotate-180">▼</span>
+              </summary>
+              <div class="mt-2.5 pt-2.5 border-t border-[var(--border)] text-[var(--muted-foreground)] leading-relaxed">
+                <p class="text-[var(--foreground)] font-medium mb-1">【判讀方向】：</p>
+                <p>{ex.guidance}</p>
+              </div>
+            </details>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  // Progressive enhancement: filter practice questions
+  try {
+    const buttons = document.querySelectorAll('.type-btn');
+    const cards = document.querySelectorAll('.practice-card');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        try {
+          const type = btn.getAttribute('data-type');
+
+          buttons.forEach(b => {
+            b.classList.remove('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-medium');
+            b.classList.add('bg-[var(--card)]', 'text-[var(--muted-foreground)]');
+          });
+          btn.classList.remove('bg-[var(--card)]', 'text-[var(--muted-foreground)]');
+          btn.classList.add('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-medium');
+
+          cards.forEach(card => {
+            const cardType = card.getAttribute('data-type');
+            if (type === 'all' || cardType === type) {
+              (card as HTMLElement).style.display = 'block';
+            } else {
+              (card as HTMLElement).style.display = 'none';
+            }
+          });
+        } catch (e) {
+          console.error('Filter error', e);
+        }
+      });
+    });
+  } catch (err) {
+    console.error('Practice filter script error', err);
+  }
+</script>

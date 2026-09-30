@@ -1,0 +1,142 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_CONFIG } from '../config/site';
+
+const methodCollection = await getCollection('methodology');
+const methodology = methodCollection[0]?.data;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '方法論', url: `${SITE_CONFIG.canonicalBase}methodology/` },
+];
+---
+
+<Layout
+  title="方法論｜山域探勘決策模型與不確定性處理｜進階探勘教育系統｜亞馬遜國家山岳協會"
+  description="13 步山域探勘決策模型、探勘循環、資料可信度六階層、不確定性公理、決策矩陣與撤退門檻設定程序。"
+  canonicalPath="methodology/"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 space-y-12">
+    <header class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-2">
+      <span class="font-mono text-xs text-[var(--primary)] font-semibold">DECISION FRAMEWORK // METHODOLOGY</span>
+      <h1 class="text-2xl font-bold">方法論</h1>
+      <p class="text-sm text-[var(--muted-foreground)]">
+        山域探勘決策模型、探勘循環、資料可信度階層、不確定性公理、決策矩陣與撤退門檻設定程序。
+      </p>
+    </header>
+
+    {/* 1. 13-Step Model */}
+    {methodology?.thirteenSteps && (
+      <section id="thirteen-steps" class="space-y-4">
+        <div class="border-b border-[var(--border)] pb-2">
+          <h2 class="text-lg font-bold">山域探勘決策模型（13 步）</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">探勘決策的完整展開程序，每一步皆有其必須驗證的現場訊號</p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {methodology.thirteenSteps.map(step => (
+            <article class="border border-[var(--border)] bg-[var(--card)] p-4 rounded-sm space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-mono font-bold text-[var(--primary)] text-sm">{step.no}</span>
+                <span class="font-mono text-[var(--muted-foreground)] uppercase text-[11px]">{step.en}</span>
+              </div>
+              <h3 class="text-sm font-bold text-[var(--foreground)]">{step.zh}</h3>
+              <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">{step.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {/* 2. Exploration Cycle */}
+    {methodology?.cycle && (
+      <section id="exploration-cycle" class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-4">
+        <div class="border-b border-[var(--border)] pb-2">
+          <h2 class="text-lg font-bold">探勘循環</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">在未知地形中推進的微觀循環：持續觀察、假設、小幅嘗試與即時驗證</p>
+        </div>
+
+        <ol class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 list-none p-0">
+          {methodology.cycle.map((cyc, idx) => (
+            <li class="border border-[var(--border)] bg-[var(--surface)] p-3 rounded-xs space-y-1">
+              <div class="flex items-center gap-1.5 font-mono text-xs text-[var(--accent)]">
+                <span>0{idx + 1}.</span>
+                <span>{cyc.en}</span>
+              </div>
+              <h3 class="text-xs font-semibold text-[var(--foreground)]">{cyc.zh}</h3>
+              <p class="text-[11px] text-[var(--muted-foreground)] leading-normal">{cyc.note}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {/* 3. Data Reliability Tiers */}
+    {methodology?.reliabilityTiers && (
+      <section id="reliability-tiers" class="space-y-4">
+        <div class="border-b border-[var(--border)] pb-2">
+          <h2 class="text-lg font-bold">資料可信度六階層</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">非所有資料具備同等效力，不同階層資訊在決策中具有嚴格優先序</p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {methodology.reliabilityTiers.map((tier, idx) => (
+            <div class="border border-[var(--border)] bg-[var(--card)] p-4 rounded-sm space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-mono text-[var(--primary)] font-bold">{tier.tier}</span>
+                <span class="text-[11px] text-[var(--muted-foreground)]">優先度 #{idx + 1}</span>
+              </div>
+              <h3 class="text-sm font-bold text-[var(--foreground)]">{tier.name}</h3>
+              <p class="text-xs text-[var(--muted-foreground)]">{tier.note}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {/* 4. Axioms of Uncertainty */}
+    {methodology?.axioms && (
+      <section id="axioms" class="border border-[var(--border)] bg-[var(--surface)] p-6 rounded-sm space-y-4">
+        <div class="border-b border-[var(--border)] pb-2">
+          <h2 class="text-lg font-bold">不確定性公理</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">探勘決策的基本心理防線：對待「無訊號」與「過去訊號」的認知自律</p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {methodology.axioms.map((ax, idx) => (
+            <div class="border border-[var(--border)] bg-[var(--card)] p-4 rounded-xs flex items-center gap-3">
+              <span class="font-mono text-base font-bold text-[var(--caution)]">#{idx + 1}</span>
+              <p class="text-sm font-semibold text-[var(--foreground)]">{ax}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {/* 5. Stop Loss Procedure */}
+    {methodology?.stopLossProcedure && (
+      <section id="stop-loss" class="space-y-4">
+        <div class="border-b border-[var(--border)] pb-2">
+          <h2 class="text-lg font-bold">停損門檻的設定程序</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">將撤退由情緒爭執轉化為制度化條件觸發</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {methodology.stopLossProcedure.map(proc => (
+            <article class="border border-[var(--border)] bg-[var(--card)] p-4 rounded-sm space-y-2 border-l-3 border-l-[var(--caution)]">
+              <span class="font-mono text-xs text-[var(--caution)] font-bold">STEP {proc.step}</span>
+              <h3 class="text-sm font-bold text-[var(--foreground)]">{proc.title}</h3>
+              <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">{proc.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Layout>

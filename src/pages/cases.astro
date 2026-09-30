@@ -1,0 +1,150 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_CONFIG } from '../config/site';
+
+const casesCollection = await getCollection('cases');
+const allCases = casesCollection.map(c => c.data).sort((a, b) => a.chapterNo - b.chapterNo);
+
+const chaptersCollection = await getCollection('chapters');
+const sortedChapters = chaptersCollection.sort((a, b) => a.data.chapter - b.data.chapter);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '案例庫', url: `${SITE_CONFIG.canonicalBase}cases/` },
+];
+---
+
+<Layout
+  title="案例庫｜山域判讀與決策案例分析｜進階探勘教育系統｜亞馬遜國家山岳協會"
+  description="彙整全課程案例：情境、逐步判讀分析與教訓，涵蓋地圖限制、微地形、獸徑、水源、天氣與停損決策。"
+  canonicalPath="cases/"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 space-y-8">
+    <header class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-2">
+      <span class="font-mono text-xs text-[var(--primary)] font-semibold">CASE STUDIES // 36 則山域實例</span>
+      <h1 class="text-2xl font-bold">案例庫</h1>
+      <p class="text-sm text-[var(--muted-foreground)]">
+        彙整 12 章課程案例：情境背景、逐步判讀分析與核心教訓。涵蓋地圖限制、微地形、獸徑、水源、天氣與停損決策。
+      </p>
+    </header>
+
+    {/* Filter Buttons */}
+    <nav aria-label="章節案例篩選" class="border border-[var(--border)] bg-[var(--surface)] p-3 rounded-sm">
+      <p class="text-xs font-semibold text-[var(--muted-foreground)] mb-2 font-mono">依章節篩選：</p>
+      <div class="flex flex-wrap gap-1.5" id="filter-buttons">
+        <button
+          type="button"
+          data-filter="all"
+          class="filter-btn px-2.5 py-1 text-xs rounded-sm border border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)] font-medium cursor-pointer"
+        >
+          全部案例 ({allCases.length})
+        </button>
+        {sortedChapters.map(ch => (
+          <button
+            type="button"
+            data-filter={ch.id}
+            class="filter-btn px-2 py-1 text-xs rounded-sm border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--primary)] transition-colors cursor-pointer"
+          >
+            第{ch.data.chapter}章 ({allCases.filter(c => c.chapterId === ch.id).length})
+          </button>
+        ))}
+      </div>
+    </nav>
+
+    {/* Case List */}
+    <section id="cases-list" class="space-y-6">
+      <h2 class="text-lg font-bold border-b border-[var(--border)] pb-2">案例列表</h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        {allCases.map(cs => (
+          <article 
+            class="case-card border border-[var(--border)] bg-[var(--card)] p-5 rounded-sm space-y-4 flex flex-col justify-between"
+            data-chapter-id={cs.chapterId}
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-xs border-b border-[var(--border)] pb-2">
+                <a 
+                  href={`${base}/curriculum/${cs.chapterId}/`}
+                  class="font-mono text-[var(--primary)] hover:underline"
+                >
+                  第{cs.chapterNo}章 {cs.chapterTitle}
+                </a>
+                <span class="font-mono text-[var(--muted-foreground)] text-[11px]">{cs.id}</span>
+              </div>
+
+              <h3 class="text-base font-bold text-[var(--foreground)]">
+                {cs.title}
+              </h3>
+
+              <div class="space-y-1 text-xs">
+                <span class="font-semibold text-[var(--primary)]">【情境背景】</span>
+                <p class="text-[var(--muted-foreground)] leading-relaxed">
+                  {cs.context}
+                </p>
+              </div>
+
+              <div class="space-y-1 text-xs">
+                <span class="font-semibold text-[var(--terrain)]">【逐步判讀分析】</span>
+                <ol class="list-decimal pl-4 space-y-1 text-[var(--muted-foreground)] leading-relaxed">
+                  {cs.analysis.map(step => (
+                    <li>{step}</li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-[var(--border)] bg-[var(--surface)] p-3 rounded-xs text-xs space-y-1">
+              <span class="font-semibold text-[var(--accent)]">【核心教訓】</span>
+              <p class="text-[var(--foreground)] leading-relaxed">
+                {cs.takeaway}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  // Progressive enhancement: filter cases
+  try {
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.case-card');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        try {
+          const filter = btn.getAttribute('data-filter');
+
+          // Update button styles
+          buttons.forEach(b => {
+            b.classList.remove('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-medium');
+            b.classList.add('bg-[var(--card)]', 'text-[var(--muted-foreground)]');
+          });
+          btn.classList.remove('bg-[var(--card)]', 'text-[var(--muted-foreground)]');
+          btn.classList.add('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-medium');
+
+          // Filter cards
+          cards.forEach(card => {
+            const chId = card.getAttribute('data-chapter-id');
+            if (filter === 'all' || chId === filter) {
+              (card as HTMLElement).style.display = 'flex';
+            } else {
+              (card as HTMLElement).style.display = 'none';
+            }
+          });
+        } catch (e) {
+          console.error('Filter error', e);
+        }
+      });
+    });
+  } catch (err) {
+    console.error('Filter script init error', err);
+  }
+</script>

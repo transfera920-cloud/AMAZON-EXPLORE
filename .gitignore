@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Production build output
+dist/
+
+# Astro cache & temporary files
+.astro/
+
+# Environment files
+.env
+.env.production
+
+# Scraped / temporary data
+temp_scrape/
+
+# OS and Editor
+.DS_Store
+*.log

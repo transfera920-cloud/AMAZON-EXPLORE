@@ -1,0 +1,285 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SourceTag from '../../components/SourceTag.astro';
+import { getCollection, render } from 'astro:content';
+import { SITE_CONFIG, generateChapterJsonLd } from '../../config/site';
+
+export async function getStaticPaths() {
+  const chapters = await getCollection('chapters');
+  return chapters.map((chapter) => ({
+    params: { chapterId: chapter.id },
+    props: { chapter },
+  }));
+}
+
+const { chapter } = Astro.props;
+const { Content, headings } = await render(chapter);
+
+const allChapters = await getCollection('chapters');
+const sortedChapters = allChapters.sort((a, b) => a.data.chapter - b.data.chapter);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const currentIndex = sortedChapters.findIndex((c) => c.id === chapter.id);
+const prevChapter = currentIndex > 0 ? sortedChapters[currentIndex - 1] : null;
+const nextChapter = currentIndex < sortedChapters.length - 1 ? sortedChapters[currentIndex + 1] : null;
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '課程', url: `${SITE_CONFIG.canonicalBase}curriculum/` },
+  { name: `第${chapter.data.chapter}章 ${chapter.data.title}`, url: `${SITE_CONFIG.canonicalBase}curriculum/${chapter.id}/` },
+];
+
+const pageTitle = `第${chapter.data.chapter}章 ${chapter.data.title}｜進階探勘教育系統｜亞馬遜國家山岳協會`;
+const rawDesc = chapter.data.coreQuestion 
+  ? `${chapter.data.subtitle}。${chapter.data.coreQuestion}` 
+  : chapter.data.subtitle;
+const pageDescription = rawDesc.slice(0, 120);
+
+const chapterJsonLd = generateChapterJsonLd({
+  no: chapter.data.chapter,
+  id: chapter.id,
+  title: chapter.data.title,
+  subtitle: chapter.data.subtitle,
+  coreQuestion: chapter.data.coreQuestion,
+});
+
+// Filter h2 headings for in-page TOC
+const h2Headings = headings.filter(h => h.depth === 2);
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalPath={`curriculum/${chapter.id}/`}
+  ogType="article"
+  breadcrumbs={breadcrumbs}
+  jsonLd={chapterJsonLd}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
+    {/* Left Sidebar: 12 Chapters Navigation (Pure <a> tags for full crawlability) */}
+    <aside class="hidden lg:block" aria-label="章節目錄">
+      <div class="sticky top-20 space-y-3 border-r border-[var(--border)] pr-4">
+        <div class="font-mono text-xs tracking-wider text-[var(--primary)] font-semibold">
+          CHAPTERS // 課程目錄
+        </div>
+        <nav aria-label="章節快速切換">
+          <ul class="space-y-1 text-xs list-none p-0">
+            {sortedChapters.map(ch => {
+              const active = ch.id === chapter.id;
+              return (
+                <li>
+                  <a
+                    href={`${base}/curriculum/${ch.id}/`}
+                    class={`block px-2.5 py-1.5 rounded-sm transition-colors ${
+                      active
+                        ? 'bg-[var(--secondary)] text-[var(--foreground)] font-bold border-l-2 border-[var(--primary)]'
+                        : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--surface)]'
+                    }`}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    <span class="font-mono text-[11px] text-[var(--primary)] mr-1.5">
+                      {String(ch.data.chapter).padStart(2, '0')}
+                    </span>
+                    {ch.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    {/* Main Article Content */}
+    <article class="min-w-0 space-y-8">
+      {/* Chapter Header */}
+      <header class="border border-[var(--border)] bg-[var(--card)] p-4 sm:p-6 rounded-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="font-mono text-xs text-[var(--primary)] font-semibold">
+            CHAPTER {String(chapter.data.chapter).padStart(2, '0')}
+          </span>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            {chapter.data.sources.map(src => (
+              <SourceTag tag={src} />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold leading-tight">
+            {chapter.data.title}
+          </h1>
+          <p class="mt-1 text-sm sm:text-base text-[var(--muted-foreground)]">
+            {chapter.data.subtitle}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-1 pt-1">
+          {chapter.data.tags.map(tag => (
+            <span class="px-2 py-0.5 border border-[var(--border)] rounded-xs font-mono text-[11px] text-[var(--muted-foreground)]">
+              #{tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Core Question Box */}
+        {chapter.data.coreQuestion && (
+          <div class="border-l-2 border-[var(--primary)] bg-[var(--surface)] p-3 rounded-xs text-xs sm:text-sm leading-relaxed">
+            <span class="font-semibold text-[var(--primary)] mr-1.5">【核心問題】</span>
+            <span>{chapter.data.coreQuestion}</span>
+          </div>
+        )}
+
+        {/* Interactive Feature: Mark Chapter Complete button */}
+        <div class="pt-2 flex items-center justify-between border-t border-[var(--border)] text-xs">
+          <button
+            id={`mark-complete-${chapter.id}`}
+            type="button"
+            data-chapter-id={chapter.id}
+            class="px-3 py-1.5 rounded-sm border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--secondary)] transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <span id="complete-icon">◯</span>
+            <span id="complete-text">標記本章完成</span>
+          </button>
+          
+          <span class="text-[11px] text-[var(--muted-foreground)]">
+            閱讀進度保存於本機瀏覽器
+          </span>
+        </div>
+      </header>
+
+      {/* In-page Anchor TOC (Required by SEO Requirement 9) */}
+      {h2Headings.length > 0 && (
+        <nav aria-label="本頁小節目錄" class="border border-[var(--border)] bg-[var(--surface)] p-4 rounded-sm space-y-2">
+          <p class="text-xs font-bold text-[var(--foreground)] flex items-center gap-1.5">
+            <span>📑</span> 本章小節目錄
+          </p>
+          <ul class="grid gap-1 sm:grid-cols-2 lg:grid-cols-3 text-xs list-none p-0">
+            {h2Headings.map(h => (
+              <li>
+                <a
+                  href={`#${h.slug}`}
+                  class="text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors block py-0.5 hover:underline"
+                >
+                  {h.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+
+      {/* Chapter Body */}
+      {chapter.id === 'ch01' ? (
+        <section class="prose-custom max-w-none text-sm leading-relaxed space-y-6">
+          <Content />
+        </section>
+      ) : (
+        <section class="border border-dashed border-[var(--border)] bg-[var(--card)] p-8 rounded-sm text-center space-y-4">
+          <div class="text-3xl">📝</div>
+          <h2 class="text-lg font-bold">本章內容待匯入</h2>
+          <p class="text-sm text-[var(--muted-foreground)] max-w-xl mx-auto leading-relaxed">
+            依設計規劃，本章前置資訊（Frontmatter、核心問題、標籤、學習資源 Schema）已建置完成。全文 Markdown 內容待後續匯入。
+          </p>
+          <div class="pt-4 flex justify-center">
+            <a
+              href={`${base}/curriculum/ch01/`}
+              class="px-4 py-2 border border-[var(--primary)] text-[var(--primary)] text-xs rounded-sm hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-colors"
+            >
+              ← 參閱第 1 章範例完整內容
+            </a>
+          </div>
+        </section>
+      )}
+
+      {/* Chapter Summary (Takeaway) */}
+      {chapter.data.summary && chapter.data.summary.length > 0 && (
+        <section class="border border-[var(--border)] bg-[var(--card)] p-4 sm:p-6 rounded-sm space-y-3">
+          <h2 class="text-base font-bold text-[var(--foreground)]">教學重點摘要</h2>
+          <ul class="list-disc pl-5 space-y-1.5 text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+            {chapter.data.summary.map(s => (
+              <li>{s}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Crawlable Prev / Next Chapter Navigation (Pure <a> tags) */}
+      <nav aria-label="相鄰章節導覽" class="border-t border-[var(--border)] pt-6 flex items-center justify-between gap-4 text-xs sm:text-sm">
+        <div>
+          {prevChapter ? (
+            <a
+              href={`${base}/curriculum/${prevChapter.id}/`}
+              class="text-[var(--primary)] hover:underline flex items-center gap-1 font-medium"
+            >
+              ← 第{prevChapter.data.chapter}章 {prevChapter.data.title}
+            </a>
+          ) : (
+            <span class="text-[var(--muted-foreground)]">（已是第一章）</span>
+          )}
+        </div>
+
+        <div>
+          {nextChapter ? (
+            <a
+              href={`${base}/curriculum/${nextChapter.id}/`}
+              class="text-[var(--primary)] hover:underline flex items-center gap-1 font-medium"
+            >
+              第{nextChapter.data.chapter}章 {nextChapter.data.title} →
+            </a>
+          ) : (
+            <span class="text-[var(--muted-foreground)]">（已是最後一章）</span>
+          )}
+        </div>
+      </nav>
+    </article>
+  </div>
+</Layout>
+
+{/* Client script for localStorage progress toggle */}
+<script is:inline define:vars={{ chapterId: chapter.id }}>
+  (function() {
+    try {
+      const btn = document.getElementById('mark-complete-' + chapterId);
+      const icon = document.getElementById('complete-icon');
+      const text = document.getElementById('complete-text');
+      
+      const storageKey = 'hike_chapter_progress';
+      let progress = {};
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) progress = JSON.parse(stored);
+      } catch (e) {}
+
+      function updateUI(completed) {
+        if (!btn || !icon || !text) return;
+        if (completed) {
+          icon.textContent = '✓';
+          text.textContent = '已標記完成（點此取消）';
+          btn.classList.add('border-[var(--terrain)]', 'text-[var(--terrain)]');
+        } else {
+          icon.textContent = '◯';
+          text.textContent = '標記本章完成';
+          btn.classList.remove('border-[var(--terrain)]', 'text-[var(--terrain)]');
+        }
+      }
+
+      updateUI(!!progress[chapterId]);
+
+      btn?.addEventListener('click', function() {
+        try {
+          progress[chapterId] = !progress[chapterId];
+          localStorage.setItem(storageKey, JSON.stringify(progress));
+          updateUI(progress[chapterId]);
+        } catch (err) {
+          console.error('LocalStorage write error', err);
+        }
+      });
+    } catch (e) {
+      console.error('Progress script init error', e);
+    }
+  })();
+</script>

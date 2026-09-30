@@ -1,0 +1,33 @@
+---
+interface Props {
+  tag: string;
+  class?: string;
+}
+
+const { tag, class: customClass = '' } = Astro.props;
+
+function getBadgeClass(t: string) {
+  switch (t) {
+    case '經驗法則':
+      return 'badge-signal';
+    case '方法論':
+      return 'badge-terrain';
+    case '科學知識':
+      return 'badge-science';
+    case '待驗證假設':
+      return 'badge-hypothesis';
+    case '風險提醒':
+      return 'badge-caution';
+    case '延伸知識':
+      return 'badge-extra';
+    default:
+      return 'badge-terrain';
+  }
+}
+---
+
+<span class={`badge-source ${getBadgeClass(tag)} ${customClass}`} role="note">
+  <span class="font-mono text-[10px] opacity-75">【</span>
+  <span>{tag}</span>
+  <span class="font-mono text-[10px] opacity-75">】</span>
+</span>

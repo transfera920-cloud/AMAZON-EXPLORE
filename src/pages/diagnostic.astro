@@ -1,0 +1,259 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_CONFIG } from '../config/site';
+
+const diagCollection = await getCollection('diagnostic');
+const diagnostic = diagCollection[0]?.data;
+
+const dimensions = diagnostic?.dimensions || [];
+const levels = diagnostic?.levels || [];
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '能力診斷', url: `${SITE_CONFIG.canonicalBase}diagnostic/` },
+];
+---
+
+<Layout
+  title="能力診斷｜探勘能力十面向自評與分級｜進階探勘教育系統｜亞馬遜國家山岳協會"
+  description="以十個探勘能力面向自評，得出目前能力剖面與 Level 1–6 定位，並指出對應的補強章節。"
+  canonicalPath="diagnostic/"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 space-y-8">
+    <header class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-2">
+      <span class="font-mono text-xs text-[var(--primary)] font-semibold">CAPABILITY DIAGNOSTIC // 10 DIMENSIONS</span>
+      <h1 class="text-2xl font-bold">能力診斷</h1>
+      <p class="text-sm text-[var(--muted-foreground)]">
+        以十個探勘能力面向自評，得出目前能力剖面與 Level 1–6 定位，並指出對應的補強章節。評估紀錄保存在您的本機瀏覽器。
+      </p>
+    </header>
+
+    {/* Realtime Result Card */}
+    <div id="diagnostic-summary-card" class="border border-[var(--primary)] bg-[var(--surface)] p-6 rounded-sm space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="font-mono text-xs text-[var(--primary)]">CURRENT LEVEL POSITION</span>
+          <h2 id="current-level-name" class="text-xl font-bold text-[var(--foreground)] mt-0.5">
+            請在下方評分（Level 1–6）
+          </h2>
+          <p id="current-level-desc" class="text-xs text-[var(--muted-foreground)] mt-1">
+            完成 10 個面向自評後，系統將自動計算能力剖面及弱項補強章節建議。
+          </p>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="border border-[var(--border)] bg-[var(--card)] px-4 py-2 rounded-sm text-center">
+            <div class="font-mono text-[10px] text-[var(--muted-foreground)] uppercase">平均得分</div>
+            <div id="average-score" class="font-mono text-2xl font-bold text-[var(--primary)]">--</div>
+          </div>
+          <div class="border border-[var(--border)] bg-[var(--card)] px-4 py-2 rounded-sm text-center">
+            <div class="font-mono text-[10px] text-[var(--muted-foreground)] uppercase">已自評面向</div>
+            <div id="completed-count" class="font-mono text-2xl font-bold text-[var(--foreground)]">0 / 10</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="recommendation-box" class="hidden pt-3 border-t border-[var(--border)] text-xs space-y-1">
+        <span class="font-semibold text-[var(--primary)]">【優先補強章節建議】：</span>
+        <div id="recommended-chapters" class="flex flex-wrap gap-2 pt-1"></div>
+      </div>
+    </div>
+
+    {/* 10 Capability Dimensions Assessment Form */}
+    <section class="space-y-6">
+      <h2 class="text-lg font-bold border-b border-[var(--border)] pb-2">十面向自評</h2>
+
+      <div class="grid gap-6 md:grid-cols-2">
+        {dimensions.map(dim => (
+          <article class="border border-[var(--border)] bg-[var(--card)] p-5 rounded-sm space-y-4 flex flex-col justify-between" id={`dimension-${dim.key}`}>
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs text-[var(--primary)] uppercase font-semibold">
+                  {dim.key}
+                </span>
+                <span class="text-xs text-[var(--muted-foreground)]">
+                  對應章節：{dim.chapters.map(c => (
+                    <a href={`${base}/curriculum/${c}/`} class="text-[var(--primary)] hover:underline ml-1">
+                      {c}
+                    </a>
+                  ))}
+                </span>
+              </div>
+
+              <h3 class="text-base font-bold text-[var(--foreground)]">
+                {dim.name}
+              </h3>
+
+              <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+                {dim.detail}
+              </p>
+
+              <div class="pt-2">
+                <p class="text-[11px] font-semibold text-[var(--foreground)] mb-1">判斷考量項目：</p>
+                <ul class="list-disc pl-4 text-[11px] text-[var(--muted-foreground)] space-y-0.5">
+                  {dim.items.map(item => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Score Selector (Level 1 to 6) */}
+            <div class="pt-4 border-t border-[var(--border)]">
+              <label for={`select-${dim.key}`} class="block text-xs font-semibold text-[var(--muted-foreground)] mb-2">
+                自評等級（1 = 初學跟隨，6 = 領隊決策）：
+              </label>
+              <div class="grid grid-cols-6 gap-1" data-dim-key={dim.key}>
+                {[1, 2, 3, 4, 5, 6].map(score => (
+                  <button
+                    type="button"
+                    data-score={score}
+                    class="score-btn py-1.5 text-xs font-mono font-medium rounded-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--muted-foreground)] hover:border-[var(--primary)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+                  >
+                    L{score}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    {/* Level 1 to 6 Benchmark Reference Table */}
+    <section class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-4">
+      <h2 class="text-lg font-bold border-b border-[var(--border)] pb-2">探勘能力分級標準對照表</h2>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {levels.map(lvl => (
+          <div class="border border-[var(--border)] bg-[var(--surface)] p-4 rounded-xs space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs px-2 py-0.5 rounded-xs bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30 font-bold">
+                Level {lvl.level}
+              </span>
+              <h3 class="text-sm font-bold text-[var(--foreground)]">{lvl.name}</h3>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+              {lvl.detail}
+            </p>
+            <div class="pt-2 border-t border-[var(--border)] text-[11px] space-y-1">
+              <span class="font-semibold text-[var(--foreground)]">檢驗判準：</span>
+              <ul class="list-disc pl-4 space-y-0.5 text-[var(--muted-foreground)]">
+                {lvl.criteria.map(crit => (
+                  <li>{crit}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script is:inline define:vars={{ dimensions, levels, base }}>
+  (function() {
+    try {
+      const storageKey = 'hike_diagnostic_scores';
+      let scores = {};
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) scores = JSON.parse(stored);
+      } catch (e) {}
+
+      function updateDashboard() {
+        const completedKeys = Object.keys(scores).filter(k => scores[k] > 0);
+        const count = completedKeys.length;
+        const avg = count > 0 
+          ? (completedKeys.reduce((acc, k) => acc + scores[k], 0) / count).toFixed(1)
+          : '--';
+
+        const avgEl = document.getElementById('average-score');
+        const countEl = document.getElementById('completed-count');
+        const levelNameEl = document.getElementById('current-level-name');
+        const levelDescEl = document.getElementById('current-level-desc');
+        const recBox = document.getElementById('recommendation-box');
+        const recChapters = document.getElementById('recommended-chapters');
+
+        if (avgEl) avgEl.textContent = avg;
+        if (countEl) countEl.textContent = count + ' / 10';
+
+        if (count > 0 && levelNameEl && levelDescEl) {
+          const roundedLevel = Math.min(6, Math.max(1, Math.round(Number(avg))));
+          const matchedLevel = levels.find(l => l.level === roundedLevel);
+          if (matchedLevel) {
+            levelNameEl.textContent = '綜合定位：Level ' + matchedLevel.level + ' ' + matchedLevel.name;
+            levelDescEl.textContent = matchedLevel.detail;
+          }
+
+          // Suggest lowest rated dimensions
+          if (recBox && recChapters) {
+            recBox.classList.remove('hidden');
+            recChapters.innerHTML = '';
+            
+            // Find dimensions with lowest scores
+            const sortedDims = [...dimensions].sort((a, b) => (scores[a.key] || 0) - (scores[b.key] || 0));
+            const lowest = sortedDims.filter(d => (scores[d.key] || 0) <= Math.min(Number(avg), 4)).slice(0, 3);
+            
+            if (lowest.length > 0) {
+              lowest.forEach(d => {
+                d.chapters.forEach(ch => {
+                  const a = document.createElement('a');
+                  a.href = base + '/curriculum/' + ch + '/';
+                  a.className = 'px-2 py-1 rounded-xs border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] text-xs transition-colors';
+                  a.textContent = ch + ' (' + d.name + ')';
+                  recChapters.appendChild(a);
+                });
+              });
+            } else {
+              recChapters.textContent = '目前所有面向均在均值以上，可針對 Level 5 探勘者標準進行實作深化。';
+            }
+          }
+        }
+      }
+
+      // Initialize UI button states
+      document.querySelectorAll('[data-dim-key]').forEach(group => {
+        const dimKey = group.getAttribute('data-dim-key');
+        const savedScore = scores[dimKey];
+        if (savedScore) {
+          const targetBtn = group.querySelector('[data-score="' + savedScore + '"]');
+          if (targetBtn) {
+            targetBtn.classList.remove('bg-[var(--surface)]', 'text-[var(--muted-foreground)]');
+            targetBtn.classList.add('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-bold');
+          }
+        }
+
+        group.querySelectorAll('.score-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            try {
+              const score = Number(this.getAttribute('data-score'));
+              scores[dimKey] = score;
+              localStorage.setItem(storageKey, JSON.stringify(scores));
+
+              group.querySelectorAll('.score-btn').forEach(b => {
+                b.classList.remove('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-bold');
+                b.classList.add('bg-[var(--surface)]', 'text-[var(--muted-foreground)]');
+              });
+              this.classList.remove('bg-[var(--surface)]', 'text-[var(--muted-foreground)]');
+              this.classList.add('bg-[var(--primary)]', 'text-[var(--primary-foreground)]', 'font-bold');
+
+              updateDashboard();
+            } catch (err) {
+              console.error('Score save error', err);
+            }
+          });
+        });
+      });
+
+      updateDashboard();
+    } catch (e) {
+      console.error('Diagnostic init error', e);
+    }
+  })();
+</script>

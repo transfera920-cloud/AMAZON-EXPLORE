@@ -1,0 +1,64 @@
+---
+import SourceTag from './SourceTag.astro';
+---
+
+<footer class="mt-16 border-t border-[var(--border)] bg-[var(--surface)] py-10">
+  <div class="mx-auto max-w-[1400px] px-4 space-y-6 text-xs text-[var(--muted-foreground)]">
+    {/* Source Legend */}
+    <div class="border border-[var(--border)] bg-[var(--card)] p-4 rounded-sm space-y-3">
+      <p class="font-semibold text-[var(--foreground)] text-xs">教材來源標示說明（非單純色彩區分，每項皆有實質方法論意義）：</p>
+      <div class="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+        <div class="flex items-start gap-2">
+          <SourceTag tag="經驗法則" />
+          <span>來自講師長期山域經驗的判斷傾向，需現場驗證，不可視為穩定規則。</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <SourceTag tag="方法論" />
+          <span>可被其他人重複操作的判斷方法與程序。</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <SourceTag tag="科學知識" />
+          <span>具有明確理論或研究基礎的知識（如 GIS、水文、生態學）。</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <SourceTag tag="待驗證假設" />
+          <span>目前僅為合理推論，缺乏足夠現場資料或統計支持。</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <SourceTag tag="風險提醒" />
+          <span>非路徑規則，而是安全底線與程序性決策提醒。</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <SourceTag tag="延伸知識" />
+          <span>本課程補充之背景原理，非原講師單一觀點。</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Brand disclaimer */}
+    <div class="space-y-2">
+      <p class="text-sm font-semibold text-[var(--foreground)]">
+        <a 
+          href="https://amazon-hike.com/" 
+          class="hover:text-[var(--primary)] transition-colors underline underline-offset-4 font-bold"
+        >
+          亞馬遜國家山岳協會
+        </a>
+        ｜進階探勘思維與山域風險決策教案系統
+      </p>
+      <p>
+        本教材中的經驗法則、方法論、科學知識、待驗證假設與延伸知識均已分別標示；經驗性內容需現場驗證，不得視為穩定規則。
+      </p>
+      <p>
+        本課程不鼓勵無限制冒險。所有技術內容同時包含適用條件、限制、撤退條件與風險升級訊號。
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--border)] text-[11px]">
+      <p>
+        © <a href="https://amazon-hike.com/" class="hover:text-[var(--primary)] transition-colors underline underline-offset-2">亞馬遜國家山岳協會</a> Amazon Hike Association. All rights reserved.
+      </p>
+      <p class="font-mono">ADVANCED EXPLORATION SYSTEM</p>
+    </div>
+  </div>
+</footer>

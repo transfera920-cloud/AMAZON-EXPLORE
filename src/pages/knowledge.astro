@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_CONFIG } from '../config/site';
+
+const knowCollection = await getCollection('knowledge');
+const knowledgeFields = knowCollection.map(k => k.data);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '知識補充', url: `${SITE_CONFIG.canonicalBase}knowledge/` },
+];
+---
+
+<Layout
+  title="知識補充｜GIS、LiDAR、水文、地質與決策科學｜進階探勘教育系統｜亞馬遜國家山岳協會"
+  description="課程延伸的背景知識：DEM 與等高線生產、光達陰影圖、集水與基流、森林結構、坡地穩定、數值預報不確定性與認知偏誤。"
+  canonicalPath="knowledge/"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 space-y-8">
+    <header class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-2">
+      <span class="font-mono text-xs text-[var(--science)] font-semibold">SCIENTIFIC FOUNDATIONS // KNOWLEDGE</span>
+      <h1 class="text-2xl font-bold">知識補充</h1>
+      <p class="text-sm text-[var(--muted-foreground)]">
+        課程延伸的背景原理：地理資訊系統（GIS）、空載光達（LiDAR）、水文集水分析、森林生態結構、坡地地質穩定性、數值預報誤差與認知科學。
+      </p>
+    </header>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      {knowledgeFields.map(field => (
+        <article class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-3">
+          <div class="flex items-center gap-2 border-b border-[var(--border)] pb-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[var(--science)]"></span>
+            <h2 class="text-lg font-bold text-[var(--foreground)]">{field.field}</h2>
+          </div>
+
+          <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
+            {field.items.map(item => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</Layout>

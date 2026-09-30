@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --radius: 0.25rem;
+    --background: oklch(17% 0.018 165);
+    --foreground: oklch(93% 0.012 150);
+    --surface: oklch(21% 0.02 165);
+    --surface-2: oklch(25% 0.022 168);
+    --card: oklch(21% 0.02 165);
+    --card-foreground: oklch(93% 0.012 150);
+    --popover: oklch(21% 0.02 165);
+    --popover-foreground: oklch(93% 0.012 150);
+    --primary: oklch(76% 0.15 78);
+    --primary-foreground: oklch(19% 0.03 70);
+    --secondary: oklch(28% 0.025 170);
+    --secondary-foreground: oklch(92% 0.012 150);
+    --muted: oklch(26% 0.02 168);
+    --muted-foreground: oklch(70% 0.018 160);
+    --accent: oklch(70% 0.09 195);
+    --accent-foreground: oklch(18% 0.03 195);
+    --destructive: oklch(62% 0.18 25);
+    --destructive-foreground: oklch(97% 0.01 25);
+    --border: oklch(31% 0.02 168);
+    --input: oklch(30% 0.02 168);
+    --ring: oklch(70% 0.09 195);
+    
+    /* Terrain semantic tokens */
+    --signal: oklch(78% 0.13 85);
+    --terrain: oklch(72% 0.11 145);
+    --science: oklch(72% 0.1 235);
+    --hypothesis: oklch(70% 0.11 305);
+    --caution: oklch(68% 0.17 30);
+    --extra: oklch(68% 0.06 200);
+    --contour: oklch(34% 0.03 150);
+  }
+
+  /* Light mode support */
+  html.light {
+    --background: oklch(98% 0.005 165);
+    --foreground: oklch(20% 0.02 165);
+    --surface: oklch(94% 0.008 165);
+    --surface-2: oklch(90% 0.012 168);
+    --card: oklch(96% 0.006 165);
+    --card-foreground: oklch(20% 0.02 165);
+    --popover: oklch(96% 0.006 165);
+    --popover-foreground: oklch(20% 0.02 165);
+    --primary: oklch(48% 0.14 78);
+    --primary-foreground: oklch(98% 0.005 70);
+    --secondary: oklch(90% 0.015 170);
+    --secondary-foreground: oklch(25% 0.02 150);
+    --muted: oklch(92% 0.01 168);
+    --muted-foreground: oklch(45% 0.02 160);
+    --accent: oklch(45% 0.12 195);
+    --accent-foreground: oklch(98% 0.005 195);
+    --border: oklch(84% 0.015 168);
+    --input: oklch(86% 0.015 168);
+    --ring: oklch(45% 0.12 195);
+
+    --signal: oklch(50% 0.14 85);
+    --terrain: oklch(42% 0.12 145);
+    --science: oklch(45% 0.12 235);
+    --hypothesis: oklch(45% 0.13 305);
+    --caution: oklch(50% 0.18 30);
+    --extra: oklch(42% 0.08 200);
+    --contour: oklch(75% 0.03 150);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+}
+
+/* Skip link */
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.5rem 1rem;
+  z-index: 9999;
+  font-weight: 500;
+  border-radius: var(--radius);
+  transition: top 0.2s ease-in-out;
+}
+.skip-to-content:focus {
+  top: 1rem;
+}
+
+/* Badge styles for source labeling */
+.badge-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  border-radius: 0.125rem;
+  border-width: 1px;
+}
+
+.badge-signal {
+  background-color: color-mix(in oklch, var(--signal) 15%, transparent);
+  color: var(--signal);
+  border-color: color-mix(in oklch, var(--signal) 40%, transparent);
+}
+
+.badge-terrain {
+  background-color: color-mix(in oklch, var(--terrain) 15%, transparent);
+  color: var(--terrain);
+  border-color: color-mix(in oklch, var(--terrain) 40%, transparent);
+}
+
+.badge-science {
+  background-color: color-mix(in oklch, var(--science) 15%, transparent);
+  color: var(--science);
+  border-color: color-mix(in oklch, var(--science) 40%, transparent);
+}
+
+.badge-hypothesis {
+  background-color: color-mix(in oklch, var(--hypothesis) 15%, transparent);
+  color: var(--hypothesis);
+  border-color: color-mix(in oklch, var(--hypothesis) 40%, transparent);
+}
+
+.badge-caution {
+  background-color: color-mix(in oklch, var(--caution) 15%, transparent);
+  color: var(--caution);
+  border-color: color-mix(in oklch, var(--caution) 40%, transparent);
+}
+
+.badge-extra {
+  background-color: color-mix(in oklch, var(--extra) 15%, transparent);
+  color: var(--extra);
+  border-color: color-mix(in oklch, var(--extra) 40%, transparent);
+}
+
+/* Mobile responsive table wrapper */
+.table-responsive-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Markdown typography styling */
+.prose-custom h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.prose-custom h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.prose-custom p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.75;
+}
+
+.prose-custom ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.75;
+}
+
+.prose-custom ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.75;
+}
+
+.prose-custom blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+  background-color: color-mix(in oklch, var(--surface) 60%, transparent);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}

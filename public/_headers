@@ -1,0 +1,32 @@
+# Cloudflare Pages / Static Server Headers
+
+# Default for all files: Security headers
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# HTML documents: Short cache, must revalidate
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Static assets with hash or immutable chunks: 1 year immutable
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Static media and images
+/*.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.svg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.xml
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/*.txt
+  Cache-Control: public, max-age=3600, must-revalidate

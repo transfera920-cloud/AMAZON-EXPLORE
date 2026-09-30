@@ -1,0 +1,128 @@
+---
+import { SITE_CONFIG, type BreadcrumbItem } from '../config/site';
+
+interface Props {
+  breadcrumbs?: BreadcrumbItem[];
+  currentPath?: string;
+}
+
+const { breadcrumbs = [], currentPath = '' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const navLinks = [
+  { href: `${base}/`, label: '首頁' },
+  { href: `${base}/curriculum/`, label: '課程' },
+  { href: `${base}/cases/`, label: '案例庫' },
+  { href: `${base}/practice/`, label: '判讀練習' },
+  { href: `${base}/diagnostic/`, label: '能力診斷' },
+  { href: `${base}/methodology/`, label: '方法論' },
+  { href: `${base}/knowledge/`, label: '知識補充' },
+  { href: `${base}/progress/`, label: '我的進度' },
+];
+
+function isActive(href: string) {
+  if (href === `${base}/`) {
+    return currentPath === `${base}/` || currentPath === `${base}`;
+  }
+  return currentPath.startsWith(href);
+}
+---
+
+<header class="border-b border-[var(--border)] bg-[var(--surface)] sticky top-0 z-40 backdrop-blur-md">
+  {/* Top brand & breadcrumb bar */}
+  <div class="mx-auto max-w-[1400px] px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-[var(--border)]">
+    <div class="flex items-center gap-2">
+      <a 
+        href="https://amazon-hike.com/" 
+        class="font-semibold text-[var(--foreground)] hover:text-[var(--primary)] transition-colors flex items-center gap-1.5"
+      >
+        <span class="inline-block w-2 h-2 rounded-full bg-[var(--primary)]"></span>
+        亞馬遜國家山岳協會
+      </a>
+    </div>
+
+    {/* Breadcrumb matching BreadcrumbList schema */}
+    {breadcrumbs && breadcrumbs.length > 0 && (
+      <nav aria-label="麵包屑導覽" class="hidden sm:block">
+        <ol class="flex items-center gap-1.5 text-[var(--muted-foreground)]">
+          {breadcrumbs.map((crumb, idx) => {
+            const isLast = idx === breadcrumbs.length - 1;
+            return (
+              <li class="flex items-center gap-1.5">
+                {idx > 0 && <span aria-hidden="true">/</span>}
+                {isLast ? (
+                  <span class="text-[var(--foreground)] font-medium" aria-current="page">
+                    {crumb.name}
+                  </span>
+                ) : (
+                  <a href={crumb.url} class="hover:text-[var(--primary)] transition-colors">
+                    {crumb.name}
+                  </a>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    )}
+
+    {/* Light / Dark Mode Toggle button */}
+    <div class="flex items-center gap-2">
+      <button 
+        id="theme-toggle" 
+        type="button" 
+        class="px-2 py-1 rounded border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] text-xs transition-colors"
+        aria-label="切換深淺色彩模式"
+      >
+        <span class="dark:inline hidden">☀️ 淺色</span>
+        <span class="dark:hidden inline">🌙 深色</span>
+      </button>
+    </div>
+  </div>
+
+  {/* Main navigation */}
+  <nav aria-label="主要導覽" class="mx-auto max-w-[1400px] px-4 overflow-x-auto">
+    <ul class="flex items-center gap-1 sm:gap-2 py-2 whitespace-nowrap text-sm">
+      {navLinks.map(link => {
+        const active = isActive(link.href);
+        return (
+          <li>
+            <a
+              href={link.href}
+              class={`inline-block px-3 py-1.5 rounded-sm transition-colors text-xs sm:text-sm ${
+                active 
+                  ? 'bg-[var(--secondary)] text-[var(--foreground)] font-medium border border-[var(--border)]' 
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)]'
+              }`}
+              aria-current={active ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </nav>
+</header>
+
+<script>
+  // Progressive enhancement: theme switcher
+  try {
+    const toggleBtn = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light');
+    }
+    
+    toggleBtn?.addEventListener('click', () => {
+      try {
+        const isLight = document.documentElement.classList.toggle('light');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      } catch (e) {
+        console.error('LocalStorage unavailable for theme', e);
+      }
+    });
+  } catch (e) {
+    console.error('Theme initialization error', e);
+  }
+</script>

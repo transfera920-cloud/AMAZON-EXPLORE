@@ -1,0 +1,108 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_CONFIG, generateCourseJsonLd } from '../../config/site';
+
+const chapters = await getCollection('chapters');
+const sortedChapters = chapters.sort((a, b) => a.data.chapter - b.data.chapter);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const breadcrumbs = [
+  { name: '首頁', url: 'https://amazon-hike.com/' },
+  { name: 'intro', url: 'https://amazon-hike.com/intro/' },
+  { name: '進階探勘教育系統', url: `${SITE_CONFIG.canonicalBase}` },
+  { name: '課程總覽', url: `${SITE_CONFIG.canonicalBase}curriculum/` },
+];
+
+const courseJsonLd = generateCourseJsonLd(sortedChapters.map(c => ({
+  no: c.data.chapter,
+  id: c.id,
+  title: c.data.title,
+  subtitle: c.data.subtitle,
+})));
+---
+
+<Layout
+  title="12 章課程總覽｜進階探勘教育系統｜亞馬遜國家山岳協會"
+  description="12 章進階探勘教材總覽：地圖限制、地形判讀、植被、地質、動物路徑、水源、天氣、路徑選擇、停損與團隊決策。"
+  canonicalPath="curriculum/"
+  breadcrumbs={breadcrumbs}
+  jsonLd={courseJsonLd}
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-8 space-y-8">
+    <header class="border border-[var(--border)] bg-[var(--card)] p-6 rounded-sm space-y-2">
+      <span class="font-mono text-xs text-[var(--primary)]">CURRICULUM OVERVIEW</span>
+      <h1 class="text-2xl font-bold">課程總覽</h1>
+      <p class="text-sm text-[var(--muted-foreground)]">
+        從路線追隨者、路徑判斷者到自主決策的探勘者。12 個章節循序拆解山域環境判讀與風險管理模型。
+      </p>
+    </header>
+
+    <section id="chapter-list" class="space-y-4">
+      <h2 class="text-lg font-bold border-b border-[var(--border)] pb-2">章節列表</h2>
+      
+      {/* Descriptive crawlable links list required by SEO spec */}
+      <ul class="space-y-4 list-none p-0">
+        {sortedChapters.map(ch => (
+          <li class="border border-[var(--border)] bg-[var(--card)] p-4 sm:p-6 rounded-sm hover:border-[var(--primary)] transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div class="space-y-2 max-w-3xl">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs text-[var(--primary)]">
+                    CHAPTER {String(ch.data.chapter).padStart(2, '0')}
+                  </span>
+                  {ch.id === 'ch01' ? (
+                    <span class="px-1.5 py-0.2 text-[10px] bg-[var(--terrain)]/20 text-[var(--terrain)] rounded-xs border border-[var(--terrain)]/40 font-mono">
+                      完整內容已上線
+                    </span>
+                  ) : (
+                    <span class="px-1.5 py-0.2 text-[10px] bg-[var(--muted)] text-[var(--muted-foreground)] rounded-xs border border-[var(--border)] font-mono">
+                      待匯入
+                    </span>
+                  )}
+                </div>
+
+                <h3 class="text-lg font-bold">
+                  <a 
+                    href={`${base}/curriculum/${ch.id}/`} 
+                    class="hover:text-[var(--primary)] transition-colors"
+                  >
+                    第{ch.data.chapter}章 {ch.data.title}
+                  </a>
+                </h3>
+
+                <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">
+                  {ch.data.subtitle}
+                </p>
+
+                {ch.data.coreQuestion && (
+                  <p class="text-xs text-[var(--foreground)] border-l-2 border-[var(--primary)] pl-2.5 py-0.5 mt-2 bg-[var(--surface)]/50">
+                    <strong class="text-[var(--primary)]">核心問題：</strong>{ch.data.coreQuestion}
+                  </p>
+                )}
+
+                <div class="flex flex-wrap gap-1 pt-1">
+                  {ch.data.tags.map(tag => (
+                    <span class="px-1.5 py-0.5 border border-[var(--border)] rounded-xs font-mono text-[10px] text-[var(--muted-foreground)]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="sm:self-center shrink-0">
+                <a
+                  href={`${base}/curriculum/${ch.id}/`}
+                  class="inline-block px-4 py-2 border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] text-xs font-medium rounded-sm transition-colors"
+                >
+                  閱讀 第{ch.data.chapter}章 {ch.data.title} →
+                </a>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</Layout>

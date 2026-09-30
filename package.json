@@ -1,0 +1,24 @@
+{
+  "name": "amazon-hike-chapter21",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev --port 3000 --host 0.0.0.0",
+    "build": "astro build && node scripts/generate-sitemap.mjs",
+    "preview": "astro preview --port 3000 --host 0.0.0.0",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^5.4.2",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.2"
+  }
+}
