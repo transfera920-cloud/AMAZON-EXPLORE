@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { SITE_CONFIG } from '../config/site';
+
+const title = `404 找不到頁面｜${SITE_CONFIG.courseName}｜${SITE_CONFIG.siteName}`;
+const description = '您所請求的頁面不存在或已被移除。請返回進階探勘教育系統首頁或前往亞馬遜國家山岳協會官方網站。';
+---
+
+<Layout
+  title={title}
+  description={description}
+  noindex={true}
+>
+  <main id="main-content" class="min-h-[60vh] flex items-center justify-center px-4 py-16">
+    <div class="max-w-md w-full text-center space-y-6 border border-[var(--border)] bg-[var(--card)] p-8 rounded-sm">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--surface)] text-[var(--primary)] font-mono text-2xl font-bold border border-[var(--border)]">
+        404
+      </div>
+      
+      <div class="space-y-2">
+        <h1 class="text-xl font-bold text-[var(--foreground)]">找不到指定的頁面</h1>
+        <p class="text-sm text-[var(--muted-foreground)] leading-relaxed">
+          您所訪問的路徑不存在、可能已被移動或網址輸入有誤。
+        </p>
+      </div>
+
+      <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a
+          href={`${SITE_CONFIG.basePath}/`}
+          class="w-full sm:w-auto px-4 py-2 text-xs font-medium rounded-xs bg-[var(--primary)] text-white hover:opacity-90 transition-opacity"
+        >
+          返回教材首頁
+        </a>
+        <a
+          href="https://amazon-hike.com/"
+          class="w-full sm:w-auto px-4 py-2 text-xs font-medium rounded-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
+        >
+          亞馬遜山岳主站
+        </a>
+      </div>
+    </div>
+  </main>
+</Layout>

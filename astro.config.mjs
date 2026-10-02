@@ -4,7 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://amazon-hike.com',
-  base: '/chapter21',
+  base: '/chapter22',
+  outDir: './dist/chapter22',
   trailingSlash: 'always',
   output: 'static',
   vite: {
@@ -25,11 +26,11 @@ export default defineConfig({
                 const url = (req.originalUrl || req.url || '').split('?')[0];
                 if (url === '/' || url === '/index.html' || url === '') {
                   res.writeHead(302, {
-                    Location: '/chapter21/',
+                    Location: '/chapter22/',
                     'Content-Type': 'text/html; charset=utf-8',
                   });
                   res.end(
-                    '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/chapter21/"><script>window.location.replace("/chapter21/");</script></head><body><p>Redirecting to <a href="/chapter21/">/chapter21/</a>...</p></body></html>'
+                    '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/chapter22/"><script>window.location.replace("/chapter22/");</script></head><body><p>Redirecting to <a href="/chapter22/">/chapter22/</a>...</p></body></html>'
                   );
                   return;
                 }

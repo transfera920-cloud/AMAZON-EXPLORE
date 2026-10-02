@@ -18,17 +18,17 @@ export interface SiteConfig {
 export const SITE_CONFIG: SiteConfig = {
   siteName: '亞馬遜國家山岳協會',
   siteUrl: 'https://amazon-hike.com',
-  basePath: '/chapter21',
-  canonicalBase: 'https://amazon-hike.com/chapter21/',
+  basePath: '/chapter22',
+  canonicalBase: 'https://amazon-hike.com/chapter22/',
   courseName: '進階探勘教育系統',
-  defaultOgImage: 'https://amazon-hike.com/chapter21/og.png',
+  defaultOgImage: 'https://amazon-hike.com/chapter22/og.png',
   datePublished: '2025-01-15T00:00:00+08:00',
   dateModified: '2025-02-01T00:00:00+08:00',
   organization: {
     '@type': 'Organization',
     name: '亞馬遜國家山岳協會',
     url: 'https://amazon-hike.com/',
-    logo: 'https://amazon-hike.com/chapter21/og.png',
+    logo: 'https://amazon-hike.com/chapter22/og.png',
   },
 };
 

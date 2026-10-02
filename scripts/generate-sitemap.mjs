@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const SITE_URL = 'https://amazon-hike.com';
-const BASE_PATH = '/chapter21';
+const BASE_PATH = '/chapter22';
 const TODAY = new Date().toISOString().split('T')[0];
 
 // All indexable pages (excluding progress)
@@ -40,7 +40,7 @@ const xmlEntries = indexableRoutes.map(route => {
 }).join('\n');
 
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<!-- 亞馬遜國家山岳協會 第 21 章 Chapter 21 Sitemap 條目片段 -->
+<!-- 亞馬遜國家山岳協會 第 22 章 Chapter 22 Sitemap 條目片段 -->
 <!-- 請將以下內容合併至 https://amazon-hike.com/sitemap.xml -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${xmlEntries}
@@ -48,11 +48,15 @@ ${xmlEntries}
 `;
 
 // Write to public/
-fs.writeFileSync('public/chapter21-sitemap-entries.xml', sitemapContent);
-console.log('✓ Created public/chapter21-sitemap-entries.xml');
+fs.writeFileSync('public/chapter22-sitemap-entries.xml', sitemapContent);
+console.log('✓ Created public/chapter22-sitemap-entries.xml');
 
-// If dist exists, write to dist/
-if (fs.existsSync('dist')) {
-  fs.writeFileSync('dist/chapter21-sitemap-entries.xml', sitemapContent);
-  console.log('✓ Created dist/chapter21-sitemap-entries.xml');
+// Write to dist/chapter22/ if dist exists or dist/chapter22 exists
+if (fs.existsSync('dist/chapter22')) {
+  fs.writeFileSync('dist/chapter22/chapter22-sitemap-entries.xml', sitemapContent);
+  console.log('✓ Created dist/chapter22/chapter22-sitemap-entries.xml');
+} else if (fs.existsSync('dist')) {
+  fs.mkdirSync('dist/chapter22', { recursive: true });
+  fs.writeFileSync('dist/chapter22/chapter22-sitemap-entries.xml', sitemapContent);
+  console.log('✓ Created dist/chapter22/chapter22-sitemap-entries.xml');
 }

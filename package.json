@@ -1,5 +1,5 @@
 {
-  "name": "amazon-hike-chapter21",
+  "name": "amazon-hike-chapter22",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -8,8 +8,9 @@
   },
   "scripts": {
     "dev": "astro dev --port 3000 --host 0.0.0.0",
-    "build": "astro build && node scripts/generate-sitemap.mjs",
-    "preview": "astro preview --port 3000 --host 0.0.0.0",
+    "build": "astro build && node scripts/generate-sitemap.mjs && node scripts/post-build.mjs",
+    "preview": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "wrangler": "^4.0.0"
   }
 }

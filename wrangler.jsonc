@@ -1,7 +1,8 @@
 {
   "name": "amazon-explore",
-  "compatibility_date": "2026-10-01",
+  "compatibility_date": "2026-09-26",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "not_found_handling": "404-page"
   }
 }

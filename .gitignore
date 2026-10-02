@@ -4,6 +4,9 @@ node_modules/
 # Production build output
 dist/
 
+# Cloudflare Wrangler
+.wrangler/
+
 # Astro cache & temporary files
 .astro/
 

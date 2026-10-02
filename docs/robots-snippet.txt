@@ -1,0 +1,4 @@
+# 亞馬遜國家山岳協會 (amazon-hike.com) 主站 robots.txt 建議追加條目
+# 請將以下行加至主站根目錄的 robots.txt 檔案中：
+
+Sitemap: https://amazon-hike.com/chapter22/chapter22-sitemap-entries.xml
